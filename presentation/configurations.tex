@@ -1,0 +1,73 @@
+\usetheme{RRgroup3}
+
+\usepackage{nth}
+\usepackage{amsmath}
+\usepackage{stmaryrd}
+\usepackage{centernot}
+\usepackage{ragged2e}
+\usepackage{bm}
+\usepackage{moreverb}
+\usepackage{tabu}
+\usepackage{siunitx}
+\usepackage[version=4]{mhchem}
+\usepackage[table]{colortbl}
+\usepackage[normalem]{ulem}
+\usepackage[justification=centering]{caption}
+\usepackage{alltt} 
+\usepackage{multirow}
+\usepackage[mathscr]{euscript}
+\usepackage{psfrag}
+\usepackage{url}
+\usepackage{csquotes}
+\usepackage{booktabs}
+\usepackage{physics}
+\usepackage{xfrac}
+
+%%%%%% Hyperref %%%%%%
+\hypersetup{
+    pdftitle={},
+    pdfauthor={},
+    pdfsubject={},
+    pdfkeywords=,
+    linkcolor=black,
+    unicode=false,
+    pdftoolbar=true,
+    pdfmenubar=true,
+    pdffitwindow=true,
+    pdfnewwindow=true,
+    colorlinks=true,
+    citecolor=mitred,
+	urlcolor=mitbrightred,
+    pdfinfo={UserProperties=yes}
+}
+
+%%%%%% Bibliography %%%%%%
+\usepackage[
+	backend=biber,
+	style=authoryear-comp,
+	doi=false,
+	url=false,
+	isbn=false,
+	arxiv=false,
+	maxbibnames=99,
+	hyperref=true,
+	sorting=none,
+	eprint=false,
+	maxcitenames=2,
+	uniquelist=false
+]{biblatex}
+
+% Use ampersand instead of word "and" in in-text citations
+\renewcommand*{\finalnamedelim}{%
+  \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}%
+  \addspace\&\space}
+\setlength{\bibitemsep}{0.8ex}
+
+% Set height of red region on title frame
+% \newcommand{\colorfulTitle}{50}
+% \showTim% Show Tim the Beaver on standout frames (commented out - may not be available)
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "presentation"
+%%% End:

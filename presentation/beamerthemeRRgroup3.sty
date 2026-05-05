@@ -1,0 +1,402 @@
+% -*- LaTeX Beamer theme RRgroup3-*-
+% (c) 2026 Theo Rulko
+%          Massachusetts Institute of Technology (MIT)
+
+\ProvidesPackage{beamerthemeRRgroup3}
+\DeclareOptionBeamer{compress}{\beamer@compresstrue}
+\ProcessOptionsBeamer
+\mode<presentation>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Declare RRgroup3 theme options
+% 1. Show Tim the Beaver on standout frames?
+\newif\ifmy@showtim\DeclareOption{tim}{\my@showtimtrue}
+% 2. Set up biblatex with biber backend? (no if you want to manually set up bibliography)
+\newif\ifmy@setbiber\DeclareOption{biber}{\my@setbibertrue}
+% 3. Set up hyperref options? (no if you want to manually set up hyperref)
+\newif\ifmy@sethyperref\DeclareOption{hyperref}{\my@sethyperreftrue}
+% 4. Show slide progress bars on section title frames?
+\newif\ifmy@showprogress\DeclareOption{progressbar}{\my@showprogresstrue}
+% 5. Disable red bars in the footer?
+\newif\ifmy@nofooterbars\DeclareOption{nofooterbars}{\my@nofooterbarstrue}
+% 6. Academic unit option (meche, aeroastro, ccse, chefsi, isn)
+\newif\ifmy@unitismeche\DeclareOption{meche}{\my@unitismechetrue}
+\newif\ifmy@unitisaeroastro\DeclareOption{aeroastro}{\my@unitisaeroastrotrue}
+\newif\ifmy@unitisccse\DeclareOption{ccse}{\my@unitisccsetrue}
+\newif\ifmy@unitischefsi\DeclareOption{chefsi}{\my@unitischefsitrue}
+\newif\ifmy@unitisisn\DeclareOption{isn}{\my@unitisisntrue}
+% 7. A website URL can be specified with \website{url} in the preamble
+\newcommand{\website}[1]{\providecommand{\setwebsite}{#1}}
+
+\ProcessOptions\relax%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Set default styles (can be overridden by user)
+% Beamer default themes
+\useoutertheme[footline=authorinstitutetitle]{miniframes}
+\usecolortheme{RRgroup}
+\useinnertheme{circles}
+\setbeamertemplate{headline}{\vspace*{2.5em}} % Set top margin
+\setbeamertemplate{navigation symbols}{}      % Remove nav buttons
+\setbeamertemplate{frametitle continuation}[from second][\insertcontinuationcountroman]
+
+% Title page colors
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{subtitle}{fg=mitsecondary}
+\setbeamercolor{author}{fg=white}
+\setbeamercolor{date}{fg=white}
+\setbeamercolor{institute}{fg=white}
+
+%% Academic unit-specific options
+% - Mechanical Engineering
+\ifmy@unitismeche%
+    \providecommand{\rightlogo}{meche-white.png}
+    \colorlet{mitprimary}{black}%
+    \colorlet{mitsecondary}{mitgray}%
+\fi%
+% - AeroAstro
+\ifmy@unitisaeroastro%
+    \providecommand{\rightlogo}{aeroastro-white.png}%
+    \colorlet{mitprimary}{aeroastroblue}%
+    \colorlet{mitsecondary}{mitgray}%
+\fi%
+% - Center for Computational Science & Engineering
+\ifmy@unitisccse%
+    \providecommand{\rightlogo}{ccse-white.png}%
+    \colorlet{mitprimary}{mitdarkblue}%
+    \colorlet{mitsecondary}{mitteal}%
+\fi%
+% - CHEFSI
+\ifmy@unitischefsi%
+    \providecommand{\rightlogo}{chefsi-white.png}%
+\fi%
+% - Institute for Soldier Nanotechnologies
+\ifmy@unitisisn%
+    \providecommand{\rightlogo}{isn-white.png}%
+    \colorlet{mitprimary}{mitblue}%
+    \colorlet{mitsecondary}{black}%
+\fi%
+
+% Logo paths
+\providecommand{\leftlogo}{mit-long-lockup-white.png}
+\providecommand{\footerlogo}{mit-lockup-red.png}
+\providecommand{\footerlogolong}{mit-long-lockup-red.png}
+\providecommand{\standoutlogo}{tim.png}
+
+% Default font sizes and weights
+\setbeamerfont{normal text}{size=\small}
+\setbeamerfont{title}{size=\Huge,series=\bfseries}
+\setbeamerfont{subtitle}{size=\Huge,series=\bfseries}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\large,series=\bfseries}
+\setbeamerfont{author}{size=\small,series=\bfseries}
+\setbeamerfont{institute}{size=\small,series=\mdseries}
+\setbeamerfont{date}{size=\small}
+\setbeamerfont{section in toc}{series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize,series=\bfseries}
+\setbeamerfont{block body}{size=\normalsize}
+
+% Font sizes of bibliography
+\newcommand{\bibfontsize}{\small}
+\setbeamertemplate{bibliography item}{}
+\setbeamerfont{bibliography item}{size=\bibfontsize}
+\setbeamerfont{bibliography entry author}{size=\bibfontsize,series=\bfseries}
+\setbeamerfont{bibliography entry title}{size=\bibfontsize,series=\mdseries}
+\setbeamerfont{bibliography entry location}{size=\bibfontsize}
+\setbeamerfont{bibliography entry note}{size=\bibfontsize}
+
+% Shrink default left-right margins
+\setbeamersize{text margin left=5mm,text margin right=5mm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Required Packages (dependencies)
+\RequirePackage{hyperref}   % For hyperlinks in PDF
+\RequirePackage{graphicx}   % For including images
+\RequirePackage{animate}    % For slide animations
+\RequirePackage{ifthen}     % For conditional statements
+\RequirePackage{tikz}       % For drawing graphics
+\RequirePackage{appendixnumberbeamer} % For appendix slide numbering
+\RequirePackage{regexpatch} % For patching commands with regex
+\RequirePackage{tcolorbox}  % For colored boxes
+\RequirePackage{amsmath}    % For advanced math typesetting
+\RequirePackage{stmaryrd}   % For additional math symbols
+\RequirePackage{url}        % For formatting URLs
+\RequirePackage{tgheros}    % Use Neue Haas Grotesk, the official MIT font
+\RequirePackage{ragged2e}   % For ragged right text
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BibLaTeX and Hyperref setup (if requested by user)
+% Bibliography
+\ifmy@setbiber
+    \usepackage[
+        backend=biber,
+        style=authoryear-comp,
+        doi=false,
+        url=false,
+        isbn=false,
+        arxiv=false
+        maxbibnames=99,
+        hyperref=true,
+        sorting=none,
+        eprint=false,
+        maxcitenames=2,
+        uniquelist=false
+    ]{biblatex}
+
+    % Use ampersand instead of word "and" in in-text citations
+    \renewcommand*{\finalnamedelim}{%
+    \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}%
+    \addspace\&\space}
+    \setlength{\bibitemsep}{0.8ex} % Add space between bibliography entries
+\fi%
+
+% Hyperref
+\ifmy@sethyperref
+    \hypersetup{
+        pdftitle={},
+        pdfauthor={},
+        pdfsubject={},
+        pdfkeywords=,        % list of keywords
+        linkcolor=black,
+        unicode=false,       % non-Latin characters in Acrobat's bookmarks
+        pdftoolbar=true,     % show Acrobat's toolbar?
+        pdfmenubar=true,     % show Acrobat's menu?
+        pdffitwindow=true,   % page fit to window when opened
+        pdfnewwindow=true,   % links in new window
+        colorlinks=true,     % false: boxed links; true: colored links
+        citecolor=mitprimary,
+        urlcolor=mitsecondary,
+        pdfinfo={UserProperties=yes}
+    }
+\fi%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Define theme element utilities
+% Utility to create a colored background box
+\usetikzlibrary{calc}
+\newcommand{\setColorfulBackground}[1]{
+    \usebackgroundtemplate{
+        \begin{tikzpicture}[remember picture,overlay]
+            \fill[mitprimary] (current page.south west) rectangle ($(current page.south west) + (0,0) + (\paperwidth, #1 * \paperheight / 100)$);
+        \end{tikzpicture}%
+    }
+}
+% Apply to all slides if footer bars option is enabled
+\ifmy@nofooterbars\else%
+    \setColorfulBackground{1.4} % Horizontal footer bar with height 1.4% of slide height
+\fi%
+
+% Define a command to make a page number progress bar
+\newcommand{\progressbar}[1]{
+    \begin{tikzpicture}
+        \pgfmathsetmacro{\progress}{\insertframenumber / \inserttotalframenumber}
+        \pgfmathsetmacro{\barwidth}{\progress * #1}
+        \draw[rounded corners=1.5pt,fill=mitgray,draw=white,line width=1pt]
+            (0,0) rectangle (#1, 3pt);
+        \draw[rounded corners=1.5pt,fill=mitprimary,draw=white,line width=1pt]
+            (0,0) rectangle (\barwidth pt, 3pt);
+    \end{tikzpicture}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% List formatting
+% Make prettier numbered lists
+\setbeamertemplate{itemize item}[circle]
+\setbeamertemplate{enumerate items}[circle]
+\setbeamertemplate{enumerate item}{
+    \usebeamercolor[bg]{item projected}
+    \tikz[baseline=(char.base)]{
+        \node[shape=circle,fill=bg,draw,inner sep=1pt](char){
+            \color{fg}\bfseries\footnotesize\insertenumlabel%
+        };
+    }%
+}
+% Extend the format to the table of contents
+\setbeamertemplate{section in toc}{
+    \leavevmode%
+    {
+        \usebeamerfont*{item projected}
+        \usebeamercolor[bg]{item projected}
+        \tikz[baseline=(char.base)]{
+            \node[shape=circle,fill=bg,draw,inner sep=1pt,minimum size=1em,](char){\color{fg}\bfseries\footnotesize\inserttocsectionnumber};
+        }
+        \kern1ex%
+    }\inserttocsection\par%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Define three branded footer options
+% Author + Institution + Page
+\defbeamertemplate*{footline}{author+institution+page}{
+    \leavevmode%
+    \hbox{%
+        \begin{beamercolorbox}[wd=.15\paperwidth,ht=8mm,dp=2.5mm,
+            leftskip=4mm,rightskip=4mm plus1fil]{separation line}%
+            \includegraphics[height=0.58cm]{\footerlogo}\hfill%
+        \end{beamercolorbox}%
+        \begin{beamercolorbox}[wd=.7\paperwidth,ht=8mm,dp=2.5mm,
+            leftskip=4mm,rightskip=4mm plus1fil,center]{separation line}%
+            \usebeamerfont{author in head/foot}
+            \insertshortauthor \ --- \insertshorttitle%
+        \end{beamercolorbox}%
+        \begin{beamercolorbox}[wd=.15\paperwidth,ht=8mm,dp=2.5mm,
+            leftskip=4mm,rightskip=4mm plus1fil]{separation line}%
+            \hfill\insertframenumber/\inserttotalframenumber%
+        \end{beamercolorbox}%
+    }\vskip0pt%
+}
+% Institution + Page
+\defbeamertemplate*{footline}{institution+page}{
+    \leavevmode%
+    \hbox{\hfill%
+        \begin{beamercolorbox}[wd=\textwidth,ht=8mm,dp=2.5mm,
+            leftskip=4mm,rightskip=4mm plus1fil]{separation line}%
+            \includegraphics[height=0.58cm]{\footerlogolong}
+            \hfill%
+            \insertframenumber/\inserttotalframenumber%
+        \end{beamercolorbox}
+    \hfill}\vskip0pt%
+}
+% Page only
+\defbeamertemplate*{footline}{page}{
+    \begin{beamercolorbox}[wd=\paperwidth,ht=8mm,dp=2.5mm,
+        leftskip=4mm,rightskip=4mm plus1fil]{separation line}
+        \usebeamerfont{section in head/foot}
+        \hfill \insertframenumber/\inserttotalframenumber%
+    \end{beamercolorbox}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Define custom frames
+% Regular frame
+\setbeamertemplate{frametitle}{
+    \usebeamerfont{frametitle}\usebeamercolor{frametitle}
+    \strut\insertframetitle\strut%
+    \ifx\insertframesubtitle\@empty\else%
+        \usebeamerfont{framesubtitle}
+        \\\strut\insertframesubtitle\strut%
+    \fi%
+}
+
+% Title frame
+\newcommand{\titleframe}{{
+    \setbeamertemplate{background canvas}[default]
+    \setbeamercolor{background canvas}{bg=mitprimary}
+    \begin{frame}[t,plain]
+        \vspace{1mm}
+        \includegraphics[height=0.95cm]{\leftlogo}\hfill%
+        \ifdefined\rightlogo\includegraphics[height=0.95cm]{\rightlogo}\fi%
+        \\[1.1cm]
+        \usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle\\[1mm]%
+        \usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par
+        \vskip0pt plus 1filll
+        \begin{columns}[T,onlytextwidth]
+            \column{0.7\textwidth}
+                \usebeamerfont{author}\usebeamercolor[fg]{author}\insertauthor\par\smallskip%
+                \usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute\par%z
+            \column{0.3\textwidth}
+                \usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate\par\smallskip%
+                \ifdefined\setwebsite%
+                    \href{http://\setwebsite}{\setwebsite}%
+                \fi%
+        \end{columns}
+        \vspace{5mm}
+    \end{frame}
+}}
+
+% Standout frame
+\newcommand{\standoutframe}[2]{{
+    \setbeamertemplate{background canvas}[default]
+    \setbeamercolor{background canvas}{bg=mitprimary}
+    \setbeamercolor{normal text}{fg=white}
+    \usebeamercolor[fg]{normal text}
+    \begin{frame}[plain,c]
+        \begin{center}
+            \vspace{1.2cm}
+            \Huge\bfseries {#1}\\
+            \vspace{0.1cm}
+            \LARGE\bfseries {#2}
+            \ifmy@showtim%
+                \\\vspace{5mm}
+                \includegraphics[height=1.2cm]{\standoutlogo}
+            \fi%
+        \end{center}
+    \end{frame}
+}}
+
+% References frame
+\newcommand{\referencesframe}{
+    \begin{frame}[allowframebreaks]{References}
+        \printbibliography%
+    \end{frame}
+}
+
+% Outline frame
+\newcommand{\outlineframe}{
+    \begin{frame}[allowframebreaks]{Outline}
+        \tableofcontents%
+    \end{frame}
+}
+
+% Section title frame
+\newcommand{\showsectionheaders}{
+    \AtBeginSection[]{\sectiontitleframe}
+}
+\newcommand{\hidesectionheaders}{
+    \AtBeginSection[]{}
+}
+\newcommand{\sectiontitleframe}{{
+    \ifmy@nofooterbars\else\setColorfulBackground{1.4}\fi%
+    \begin{frame}[plain,c]\bfseries%
+        \textcolor{mitgray}{\Large Section \insertsectionnumber}\\[1mm]%
+
+        \hypersetup{linkcolor=mitprimary}%
+        \textcolor{mitprimary}{\Huge\insertsectionhead}\\[1mm]%
+
+        \ifmy@showprogress%
+            \progressbar{0.2\textwidth}
+            \textcolor{mitgray}{\tiny\insertframenumber\ / \inserttotalframenumber}%
+        \fi%
+    \end{frame}
+}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Set custom block environments
+% Tcolorbox
+\tcbuselibrary{skins}
+\tcbset{
+    colframe=mitprimary,%
+    colback=mitgray!12!white,%
+    enhanced,%
+    borderline west={3pt}{0pt}{mitprimary},%
+    boxrule=0pt,%
+    frame empty,%
+    boxsep=0pt,%
+    hbox,%
+    detach title,%
+    before upper={\tcbtitle\par\smallskip},%
+    fonttitle=\color{mitprimary}\bfseries\sffamily%
+}
+
+% Bolded, red text
+\newcommand{\mitbf}[1]{\textbf{\textcolor{mitprimary}{#1}}}
+
+% Quote environment with author
+\RenewDocumentEnvironment{quotation}{o}{%
+    \begin{tcolorbox}[
+        left=9mm,right=9mm,underlay={%
+            \node[text=mitgray,scale=4,anchor=north west,inner sep=0.2pt,font=\bfseries]
+            at ([xshift=0.5ex]interior.north west) {``};
+            \node[text=mitgray,scale=4,anchor=south east,inner sep=0.2pt,font=\bfseries]
+            at ([yshift=-3ex,xshift=-0.5ex]interior.south east) {''};
+    },borderline west={3pt}{0pt}{mitgray}]\itshape``%
+}{''\IfNoValueTF{#1}{}{\begin{flushright}\normalfont --- #1\end{flushright}}\end{tcolorbox}}
+
+% Information box environment
+\NewDocumentEnvironment{info}{mmm}{%
+    \begin{tcolorbox}[title=~#1,before title={\raisebox{-0.4ex}{\tikz{\node[circle,fill=#2,align=center,text width=1em,inner sep=0pt]{\rmfamily\itshape\bfseries\color{white} #3};}}},borderline west={3pt}{0pt}{#2},lefttitle=0pt,fonttitle=\color{black}\bfseries\sffamily]
+}{\end{tcolorbox}}
+
+\mode<all>
+
+% End of file

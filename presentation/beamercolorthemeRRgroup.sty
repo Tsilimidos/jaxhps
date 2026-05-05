@@ -1,0 +1,68 @@
+% -*- LaTeX beamer -*-
+
+% Theo Rulko
+% Massachusetts Institute of Technology
+% (C) 2025 All Rights Reserved
+
+\mode<all>
+
+%% Official MIT color palette (https://brand.mit.edu/color)
+% Core palette
+\DefineNamedColor{named}{mitred}{rgb}{0.45882353,0,0.07843137}
+\DefineNamedColor{named}{mitgray}{rgb}{0.54509804,0.58431373,0.61960784}
+\DefineNamedColor{named}{mitbrightred}{rgb}{1,0.07843137,0.13725490}
+
+% Extended palette
+\DefineNamedColor{named}{mitdarkpink}{rgb}{0.45882353,0,0.38039216}
+\DefineNamedColor{named}{mitpink}{rgb}{1,0.07843137,0.94117647}
+\DefineNamedColor{named}{mitlightpink}{rgb}{1,0.70196078,1}
+\DefineNamedColor{named}{mitdarkpurple}{rgb}{0.24313725,0,0.41960784}
+\DefineNamedColor{named}{mitpurple}{rgb}{0.6,0.2,1}
+\DefineNamedColor{named}{mitlightpurple}{rgb}{0.74901961,0.70196078,1}
+\DefineNamedColor{named}{aeroastroblue}{rgb}{0,0.301960784,0.564705882}
+\DefineNamedColor{named}{mitdarkblue}{rgb}{0,0.15686275,0.58823529}
+\DefineNamedColor{named}{mitblue}{rgb}{0.09803922,0.4,1}
+\DefineNamedColor{named}{mitlightblue}{rgb}{0.6,0.92156863,1}
+\DefineNamedColor{named}{mitteal}{rgb}{0.0117647059,0.666666667,0.611764706}
+\DefineNamedColor{named}{mitdarkgreen}{rgb}{0,0.30196078,0.10196078}
+\DefineNamedColor{named}{mitgreen}{rgb}{0,0.67843137,0}
+\DefineNamedColor{named}{mitlightgreen}{rgb}{0.66666667,1,0.2}
+\DefineNamedColor{named}{mityellow}{rgb}{1,0.92156863,0}
+\DefineNamedColor{named}{darkgray}{cmyk}{0,0,0,0.90}
+\DefineNamedColor{named}{mitdarkgray2}{rgb}{0.12941176,0.1372549,0.14901961}
+\DefineNamedColor{named}{mitdarksilvergray}{rgb}{0.38431373,0.41568627,0.45098039}
+\DefineNamedColor{named}{mitlightsilvergray}{rgb}{0.72156863,0.76078431,0.8}
+\DefineNamedColor{named}{mitlightgray1}{rgb}{0.94901961,0.95686275,0.97254902}
+\DefineNamedColor{named}{mitlightgray2}{rgb}{0.86666667,0.88235294,0.90196078}
+
+%% Beamer theme colors
+% Choose default colors
+\colorlet{mitprimary}{mitred}
+\colorlet{mitsecondary}{mitbrightred}
+
+% Beamer color theme
+\setbeamercolor{alerted text}{fg=mitprimary}
+\setbeamercolor*{palette primary}{fg=mitprimary,bg=mitgray}
+\setbeamercolor*{palette secondary}{bg=white,fg=mitgray}
+\setbeamercolor*{palette tertiary}{bg=white,fg=darkgray}
+\setbeamercolor*{palette quaternary}{bg=mitprimary,fg=white}
+\setbeamercolor*{structure}{fg=mitprimary,bg=white}
+\setbeamercolor*{frametitle}{bg=white,fg=mitprimary}
+\setbeamercolor*{framesubtitle}{fg=mitgray}
+\setbeamercolor*{section in toc}{fg=mitprimary,bg=white}
+\setbeamercolor*{titlelike}{fg=mitprimary,bg=white}
+\setbeamercolor*{example text}{fg=mitteal}
+
+% Block colors
+\setbeamercolor*{block title}{fg=mitprimary,bg=white}
+\setbeamercolor*{block body}{fg=black,bg=white}
+\setbeamercolor*{block title alerted}{fg=white,bg=mitprimary}
+\setbeamercolor*{block body alerted}{fg=black,bg=mitgray!12!white}
+\setbeamercolor*{block title example}{fg=white,bg=mitteal}
+\setbeamercolor*{block body example}{fg=black,bg=mitteal!25}
+
+% Bibliography colors
+\setbeamercolor{bibliography entry author}{fg=mitprimary}
+\setbeamercolor{bibliography entry title}{fg=black}
+\setbeamercolor{bibliography entry location}{fg=black}
+\setbeamercolor{bibliography entry note}{fg=black}
