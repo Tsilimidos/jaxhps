@@ -88,7 +88,7 @@ def setup_args() -> argparse.Namespace:
         default="data/examples/linear_elasticity_2D",
     )
     parser.add_argument(
-        "--p_vals", type=int, nargs="+", default=[3, 4, 8, 16, 32]
+        "--p_vals", type=int, nargs="+", default=[3, 4, 6, 8, 12, 16]
     )
     parser.add_argument(
         "--l_vals", type=int, nargs="+", default=[2, 3, 4]
@@ -98,7 +98,7 @@ def setup_args() -> argparse.Namespace:
         help="Maximum number of Gauss-Seidel iterations."
     )
     parser.add_argument(
-        "--tol", type=float, default=1e-10,
+        "--tol", type=float, default=1e-14,
         help="L-inf convergence tolerance on the displacement update."
     )
     parser.add_argument("--debug", action="store_true")
