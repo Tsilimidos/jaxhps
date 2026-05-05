@@ -135,6 +135,12 @@ def setup_args() -> argparse.Namespace:
                         help="Maximum Gauss-Seidel iterations.")
     parser.add_argument("--tol", type=float, default=1e-14,
                         help="L-inf convergence tolerance on displacement update.")
+    parser.add_argument(
+        "--stress_clip_percentile",
+        type=float,
+        default=99.0,
+        help="Upper percentile used to clip stress contours for visualization.",
+    )
     parser.add_argument("--debug", action="store_true")
     return parser.parse_args()
 
@@ -323,17 +329,6 @@ def plot_error_vs_p(
                 label=f"$L={l}$",
             )
 
-        # Algebraic reference lines anchored at the last data point.
-        base_err = errors[-1, -1]
-        ref_p    = pv[-1]
-        for slope, ls, label in [
-            (-0.5, "--",  r"$O(p^{-1/2})$"),
-            (-1.0, ":",   r"$O(p^{-1})$"),
-            (-2.0, "-.",  r"$O(p^{-2})$"),
-        ]:
-            ax.loglog(pv, base_err * (pv / ref_p) ** slope,
-                      color="gray", linestyle=ls, linewidth=1.0, label=label)
-
         ax.set_xlabel("Polynomial degree $p$")
         ax.set_ylabel("Relative $L^\\infty$ error")
         ax.legend(fontsize=8)
@@ -371,6 +366,34 @@ def plot_runtimes(
     logging.info("Runtime plot saved to: %s", fp)
 
 
+def plot_iterations(
+    l_vals: list,
+    p_vals: list,
+    n_iters: np.ndarray,
+    output_dir: str,
+) -> None:
+    """Line plot of Gauss-Seidel iteration count vs p, one line per L."""
+    fig, ax = plt.subplots(figsize=(7, 4.5))
+    for i, l in enumerate(l_vals):
+        ax.plot(
+            p_vals,
+            n_iters[i],
+            marker=MARKERS[i % len(MARKERS)],
+            color=COLORS[i % len(COLORS)],
+            label=f"$L={l}$",
+        )
+    ax.set_xlabel("Polynomial degree $p$")
+    ax.set_ylabel("Iterations")
+    ax.legend()
+    ax.grid(True, linestyle=":")
+    ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+    fig.tight_layout()
+    fp = os.path.join(output_dir, "iterations.png")
+    fig.savefig(fp, dpi=150)
+    plt.close(fig)
+    logging.info("Iteration plot saved to: %s", fp)
+
+
 def plot_solution_contours(
     domain: Domain,
     u_x: jnp.ndarray,
@@ -378,40 +401,24 @@ def plot_solution_contours(
     output_dir: str,
     n_levels: int = 25,
 ) -> None:
-    """
-    Filled contour plots (4 panels):
-      top row : u_x and u_y (numerical solution)
-      bottom row : |u_x - exact| and |u_y - exact| (pointwise absolute error)
-
-    Uses tricontourf on the scattered Chebyshev interior points.
-    """
+    """Filled contours for numerical u_x and u_y on Chebyshev interior points."""
     pts = np.array(domain.interior_points).reshape(-1, 2)
     x_pts, y_pts = pts[:, 0], pts[:, 1]
 
     ux_vals  = np.array(u_x).ravel()
     uy_vals  = np.array(u_y).ravel()
-    ux_ex    = np.array(williams_ux(domain.interior_points)).ravel()
-    uy_ex    = np.array(williams_uy(domain.interior_points)).ravel()
-    err_ux   = np.abs(ux_vals - ux_ex)
-    err_uy   = np.abs(uy_vals - uy_ex)
-    # Plot log-scaled errors so very small values remain visible in contours.
-    err_floor = 1e-16
-    log_err_ux = np.log10(np.maximum(err_ux, err_floor))
-    log_err_uy = np.log10(np.maximum(err_uy, err_floor))
-
     triang = mtri.Triangulation(x_pts, y_pts)
 
-    fig, axes = plt.subplots(2, 2, figsize=(11, 9))
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
     datasets = [
-        (ux_vals, "RdBu_r"),
-        (uy_vals, "RdBu_r"),
-        (log_err_ux, "viridis"),
-        (log_err_uy, "viridis"),
+        (ux_vals, r"$u_x$", "RdBu_r"),
+        (uy_vals, r"$u_y$", "RdBu_r"),
     ]
 
-    for ax, (vals, cmap) in zip(axes.ravel(), datasets):
+    for ax, (vals, title, cmap) in zip(np.ravel(axes), datasets):
         tcf = ax.tricontourf(triang, vals, levels=n_levels, cmap=cmap)
         plt.colorbar(tcf, ax=ax, shrink=0.85)
+        ax.set_title(title)
         ax.set_xlabel("$x$")
         ax.set_ylabel("$y$")
         # Mark the crack tip
@@ -443,6 +450,7 @@ def plot_displacement_magnitude(
     fig, ax = plt.subplots(figsize=(6, 5.5))
     tcf = ax.tricontourf(triang, mag, levels=n_levels, cmap="plasma")
     plt.colorbar(tcf, ax=ax, label=r"$|u|$")
+    ax.set_title(r"$|\mathbf{u}|$")
     ax.set_xlabel("$x$")
     ax.set_ylabel("$y$")
     ax.plot(0, 0, "w*", markersize=12)
@@ -459,8 +467,9 @@ def plot_stress_contours(
     u_y: jnp.ndarray,
     output_dir: str,
     n_levels: int = 25,
+    clip_percentile: float = 99.0,
 ) -> None:
-    """Filled contours for sigma_xx, sigma_yy, sigma_xy, and von Mises stress."""
+    """Filled stress contours with robust clipping to handle crack-tip blow-up."""
     ones = jnp.ones_like(domain.interior_points[..., 0])
     pde = PDEProblem(
         domain=domain,
@@ -489,17 +498,39 @@ def plot_stress_contours(
     x_pts, y_pts = pts[:, 0], pts[:, 1]
     triang = mtri.Triangulation(x_pts, y_pts)
 
+    sigma_xx_vals = np.array(sigma_xx).ravel()
+    sigma_yy_vals = np.array(sigma_yy).ravel()
+    sigma_xy_vals = np.array(sigma_xy).ravel()
+    sigma_vm_vals = np.array(sigma_vm).ravel()
+
+    signed_fields = [sigma_xx_vals, sigma_yy_vals, sigma_xy_vals]
+    signed_limits = []
+    for vals in signed_fields:
+        vmax = np.percentile(np.abs(vals), clip_percentile)
+        signed_limits.append((-vmax, vmax))
+
+    vm_low, vm_high = np.percentile(sigma_vm_vals, [5.0, clip_percentile])
+
     datasets = [
-        np.array(sigma_xx).ravel(),
-        np.array(sigma_yy).ravel(),
-        np.array(sigma_xy).ravel(),
-        np.array(sigma_vm).ravel(),
+        (sigma_xx_vals, signed_limits[0], "coolwarm", r"$\sigma_{xx}$"),
+        (sigma_yy_vals, signed_limits[1], "coolwarm", r"$\sigma_{yy}$"),
+        (sigma_xy_vals, signed_limits[2], "coolwarm", r"$\sigma_{xy}$"),
+        (sigma_vm_vals, (vm_low, vm_high), "magma", r"$\sigma_{\mathrm{vm}}$"),
     ]
 
     fig, axes = plt.subplots(2, 2, figsize=(11, 9))
-    for ax, vals in zip(axes.ravel(), datasets):
-        tcf = ax.tricontourf(triang, vals, levels=n_levels, cmap="magma")
+    for ax, (vals, lims, cmap, title) in zip(axes.ravel(), datasets):
+        vmin, vmax = lims
+        tcf = ax.tricontourf(
+            triang,
+            np.clip(vals, vmin, vmax),
+            levels=n_levels,
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+        )
         plt.colorbar(tcf, ax=ax, shrink=0.85)
+        ax.set_title(title)
         ax.set_xlabel("$x$")
         ax.set_ylabel("$y$")
         ax.plot(0, 0, "c*", markersize=10)
@@ -564,6 +595,10 @@ def main() -> None:
                   results["t_build"], results["t_solve"],
                   args.output_dir)
 
+    plot_iterations(args.l_vals, args.p_vals,
+                    results["n_iters"],
+                    args.output_dir)
+
     plot_solution_contours(
         results["last_domain"],
         results["last_ux"],
@@ -583,6 +618,7 @@ def main() -> None:
         results["last_ux"],
         results["last_uy"],
         args.output_dir,
+        clip_percentile=args.stress_clip_percentile,
     )
 
 
